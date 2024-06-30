@@ -20,7 +20,7 @@ def generate_unique_code(length):
 def home():
     session.clear()
     if request.method == "POST":
-        name = request.form.get("name")  # dictionary 에서 key 가 "name" 인 애를 가져옴
+        name = request.form.get("name")  # 
         code = request.form.get("code")
         join = request.form.get("join", False)
         # if "join" doesn't exist in the dictionary, it returns 'False' instead of 'None'.
@@ -56,7 +56,7 @@ def room():
     role = session.get("role")
     if room is None or session.get("name") is None or room not in rooms:
         return redirect(url_for("home"))
-    if role == "therapist":
+    if role == "Therapist":
         return render_template("room_therapist.html", code=room, messages=rooms[room]["messages"])
     else:
         return render_template("room_client.html", code=room, messages=rooms[room]["messages"])
@@ -69,7 +69,8 @@ def message(data):
 
     content = {
         "name": session.get("name"),
-        "message": data["data"]
+        "message": data["data"],
+        "role": data["role"]
     }
 
     send(content, to=room)
@@ -80,6 +81,7 @@ def message(data):
 def connect(auth):
     room = session.get("room")
     name = session.get("name")
+    role = session.get("role")
     if not room or not name:
         return
     if room not in rooms:
@@ -87,7 +89,7 @@ def connect(auth):
         return
 
     join_room(room)
-    send({"name": name, "message": "has entered the room"}, to=room)  # sends messages to everyone in the room
+    send({"name": name, "message": "has entered the room", "role": role}, to=room)  # sends messages to everyone in the room
     rooms[room]["members"] += 1
     print(f"{name} joined room {room}")
 
