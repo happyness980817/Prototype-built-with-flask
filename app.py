@@ -11,9 +11,7 @@ rooms = {}
 
 def generate_unique_code(length):
     while True:
-        code = ""
-        for _ in range(length):
-            code += random.choice(ascii_uppercase)
+        code = "".join(random.choice(ascii_uppercase) for _ in range(length))
         if code not in rooms:
             break
     return code  # generates new codes (not in rooms) with length of "length" parameter.
@@ -47,19 +45,21 @@ def home():
 
         session["room"] = room
         session["name"] = name  # session is a semi-permanent way to store information about a user
-        # kind of a temporary data stored on a server
-        # don't want to ask the users for a name and a room code every single time they refresh the web page.
         session["role"] = role
-        return redirect(url_for("room", role=role))
+        return redirect(url_for("room"))
 
     return render_template("home.html")
 
-@app.route("/room/<role>", methods=["POST", "GET"])
-def room(role):
+@app.route("/room", methods=["POST", "GET"])
+def room():
     room = session.get("room")
+    role = session.get("role")
     if room is None or session.get("name") is None or room not in rooms:
         return redirect(url_for("home"))
-    return render_template("room.html", code=room, messages=rooms[room]["messages"], role=role)
+    if role == "therapist":
+        return render_template("room_therapist.html", code=room, messages=rooms[room]["messages"])
+    else:
+        return render_template("room_client.html", code=room, messages=rooms[room]["messages"])
 
 @socketio.on("message")
 def message(data):
