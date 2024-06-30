@@ -36,7 +36,7 @@ def home():
     
         room = code
         if create != False:
-            room = generate_unique_code(4)
+            room = generate_unique_code(8)
             rooms[room] = {"members":0, "messages": []} # initializes rooms dictionary
         elif code not in rooms:
             return render_template("home.html",error="Room does not exist.", code=code, name=name)
